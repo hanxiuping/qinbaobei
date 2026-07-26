@@ -3,8 +3,12 @@ import {
   saveStoredToken,
   verifyState,
 } from "../_lib";
+import { requirePortalSession } from "../../../portal-auth";
 
 export async function GET(request: Request) {
+  const denied = await requirePortalSession(request);
+  if (denied) return denied;
+
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const error = url.searchParams.get("error");

@@ -1,6 +1,10 @@
 import { appDirectory, baiduConfig, isBackendBound, jsonResponse, readToken } from "../_lib";
+import { requirePortalSession } from "../../../portal-auth";
 
 export async function GET(request: Request) {
+  const denied = await requirePortalSession(request);
+  if (denied) return denied;
+
   const token = readToken(request);
   return jsonResponse({
     appKey: baiduConfig.appKey,

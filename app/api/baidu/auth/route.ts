@@ -1,6 +1,10 @@
 import { baiduConfig, saveState } from "../_lib";
+import { requirePortalSession } from "../../../portal-auth";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = await requirePortalSession(request);
+  if (denied) return denied;
+
   const state = crypto.randomUUID();
   saveState(state); // 服务端文件存储 state，不依赖浏览器 cookie
   const url = new URL("https://openapi.baidu.com/oauth/2.0/authorize");

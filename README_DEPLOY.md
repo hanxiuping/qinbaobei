@@ -17,6 +17,17 @@
 - Node.js 22.13 或更高版本
 - npm
 
+## 小程序入口认证环境变量
+
+```env
+PORTAL_API_BASE=https://api.hltree.cloud/api/portal
+PORTAL_SESSION_SECRET=至少32位的高强度随机字符串
+```
+
+- 用户只能通过微信小程序客服消息中的一次性链接进入。
+- `portal_ticket` 会由本站服务端兑换，成功后写入 12 小时有效的签名 HttpOnly Cookie。
+- `PORTAL_SESSION_SECRET` 仅配置在服务器环境中，不能提交到仓库或发送到前端。
+
 ## 百度网盘环境变量
 
 ```env
@@ -53,11 +64,16 @@ node scripts/local-preview.mjs
 
 然后打开 `http://127.0.0.1:4173`。
 
-## 部署包说明
+## 从 GitHub 更新部署
 
-- `dist/` 是已经构建好的生产产物
-- `app/`、`public/`、`package.json`、`package-lock.json` 是源码和依赖声明
-- `.openai/hosting.json` 保留站点托管配置
+```bash
+git pull
+npm ci
+npm run build
+pm2 restart qinbaobei
+```
+
+生产环境使用标准 Next.js Node 服务，默认由 `npm run start` 启动。
 
 ## 后续接入百度网盘自动上传
 

@@ -6,8 +6,12 @@ import {
   readToken,
   tokenCookie,
 } from "../_lib";
+import { requirePortalSession } from "../../../portal-auth";
 
 export async function GET(request: Request) {
+  const denied = await requirePortalSession(request);
+  if (denied) return denied;
+
   const savedToken = readToken(request);
   if (!savedToken?.accessToken) {
     return jsonResponse(

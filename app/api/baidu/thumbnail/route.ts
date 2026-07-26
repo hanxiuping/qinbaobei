@@ -4,8 +4,12 @@ import {
   readToken,
   tokenCookie,
 } from "../_lib";
+import { requirePortalSession } from "../../../portal-auth";
 
 export async function GET(request: Request) {
+  const denied = await requirePortalSession(request);
+  if (denied) return denied;
+
   const savedToken = readToken(request);
   if (!savedToken?.accessToken) {
     return jsonResponse(
@@ -18,7 +22,10 @@ export async function GET(request: Request) {
   const filePath = url.searchParams.get("path");
   const size = url.searchParams.get("size") || "1024";
   if (!filePath) {
-    return jsonResponse({ error: "bad_request", message: "缺少 path 参数" }, 400);
+    return jsonResponse(
+      { error: "bad_request", message: "缺少 path 参数" },
+      { status: 400 },
+    );
   }
 
   try {
@@ -36,7 +43,10 @@ export async function GET(request: Request) {
     if (baiduRes.status === 302 || baiduRes.status === 301) {
       const location = baiduRes.headers.get("location");
       if (!location) {
-        return jsonResponse({ error: "no_link", message: "获取缩略图失败" }, 502);
+        return jsonResponse(
+          { error: "no_link", message: "获取缩略图失败" },
+          { status: 502 },
+        );
       }
       const fileRes = await fetch(location);
       const contentType = fileRes.headers.get("content-type") || "image/jpeg";
@@ -66,7 +76,10 @@ export async function GET(request: Request) {
     }
 
     const text = await baiduRes.text();
-    return jsonResponse({ error: "baidu_api_error", message: text.slice(0, 200) }, 502);
+    return jsonResponse(
+      { error: "baidu_api_error", message: text.slice(0, 200) },
+      { status: 502 },
+    );
   } catch (caught) {
     return jsonResponse(
       {

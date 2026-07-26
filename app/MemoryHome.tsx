@@ -468,8 +468,8 @@ export function MemoryHome() {
           <button
             type="button"
             className="link-btn"
-            onClick={() => {
-              document.cookie = "album_auth=; path=/; max-age=0";
+            onClick={async () => {
+              await fetch("/api/portal/session", { method: "DELETE" });
               window.location.reload();
             }}
           >
